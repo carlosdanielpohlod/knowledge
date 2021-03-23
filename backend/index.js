@@ -4,9 +4,10 @@ const db = require('./config/db')
 
 app.db = db
 consign()
-    
-    .include('./api/validation.js')
+    .include('./config/passport.js')
+    .then('./api/validation.js')
     .then('./api/')
+    
     .then('./config/middlewares.js')
     .then('./config/routes.js')
     .into(app)

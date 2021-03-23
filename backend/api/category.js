@@ -42,7 +42,19 @@ module.exports = app => {
             res.status(400).send(msg)
         }
     }
+    const get = (req, res) => {
+        app.db('categories')
+            .then(categoriesWithPath => res.json(withPath(categoriesWithPath)))
+            .catch(err => res.status(500).send(err))
+    }
 
+    const getById = (req, res) => {
+        app.db('categories')
+            .where({id: req.params.id})
+            .first()
+            .then(category => res.json(category))
+            .catch(err => res.status(500).send(err))
+    }
     const withPath = categories => {
         const getParent = (categories, parentId) => {
             let parent = categories.filter(parent => parent.id === parentId)
@@ -67,19 +79,7 @@ module.exports = app => {
             return 0
         })
 
-        const get = (req, res) => {
-            app.db('categories')
-                .then(categoriesWithPath => res.json(withPath(categoriesWithPath)))
-                .catch(err => res.status(500).send(err))
-        }
-
-        const getById = (req, res) => {
-            app.db('categories')
-                .where({id: req.params.id})
-                .first()
-                .then(category => res.json(category))
-                .catch(err => res.status(500).send(err))
-        }
+        
         const toTree = (parameter, three) =>{
             if(!tree) tree = categories.filter(c => !c.parameter)
             tree = tree.map(parentNode => {
@@ -95,6 +95,7 @@ module.exports = app => {
                 .then(categories => res.json(toTree(withPath(categories))))
                 .catch(err => res.status(500).send(err))
         }
-        return {save, remove, get, getById}
+       
     }
+    return {save, remove, get, getById}
 }

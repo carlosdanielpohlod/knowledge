@@ -10,7 +10,7 @@ module.exports = app => {
     const save = async (req, res) => {
         const user = { ...req.body }
         if(req.params.id) user.id = req.params.id
-
+        // console.log(user)
         if(!req.originalUrl.startsWith('/users')) user.admin = false
         if(!req.user || !req.user.admin) user.admin = false
 
@@ -28,6 +28,7 @@ module.exports = app => {
                 notExistsOrError(userFromDB, 'Usuário já cadastrado')
             }
         } catch(msg) {
+            console.log(msg)
             return res.status(400).send(msg)
         }
 
@@ -38,7 +39,7 @@ module.exports = app => {
             app.db('users')
                 .update(user)
                 .where({ id: user.id })
-                .whereNull('deletedAt')
+                // .whereNull('deletedAt')
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
@@ -52,9 +53,18 @@ module.exports = app => {
     const get = (req, res) => {
         app.db('users')
             .select('id', 'name', 'email', 'admin')
-            .whereNull('deletedAt')
+            // .whereNull('deletedAt')
             .then(users => res.json(users))
             .catch(err => res.status(500).send(err))
     }
-    return {save, get}
+    const getById = (req, res) => {
+        app.db('users')
+            .select('id', 'name', 'email', 'admin')
+            .where({ id: req.params.id })
+            // .whereNull('deletedAt')
+            .first()
+            .then(user => res.json(user))
+            .catch(err => res.status(500).send(err))
+    }
+    return {save, get, getById}
 }
