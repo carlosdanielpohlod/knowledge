@@ -36,10 +36,10 @@ module.exports = app =>{
 
     const validateToken = async (req, res) => {
         const userData = req.body || null
-        
+       
         try {
             if(userData) {
-                const token = jwt.decode(userData.token, authSecret)
+                const token = jwt.decode(req.headers.authorization, authSecret)
                 if(new Date(token.exp * 1000) > new Date()) {
                     
                     return res.send(true)

@@ -50,11 +50,18 @@ module.exports = app => {
         }
     }
 
-    const get = (req, res) => {
+    const get = async (req, res) => {
+        const limitPage = 2
+        const page = req.query.page || 1
+        const result = await app.db('users').count('id').first()
+        // console.log(result['count(`id`)'])
+        const count = parseInt(result['count(`id`)'])
         app.db('users')
             .select('id', 'name', 'email', 'admin')
             .whereNull('deletedAt')
-            .then(users => res.json(users))
+            .limit(limitPage)
+            .offset(page * limitPage - limitPage)
+            .then(users => res.json({data:users, limit:limitPage, count}))
             .catch(err => res.status(500).send(err))
     }
     const getById = (req, res) => {
